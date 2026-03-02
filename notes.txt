@@ -1,0 +1,5 @@
+utils -> choices -> move all choices
+try catch in views
+ekta if a error handling
+circular dependency in manager
+id dekhano output a
