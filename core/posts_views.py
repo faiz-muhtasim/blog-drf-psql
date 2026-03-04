@@ -24,10 +24,10 @@ class PostListCreateView(APIView):
 
             post = Posts.objects.create_post(serializer.validated_data)
             return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
-        except:
-            Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-
+       
+        except Exception as e:
+            print("ERROR:", e)  
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PostRetrieveUpdateDeleteView(APIView):
     """
@@ -60,7 +60,7 @@ class PostRetrieveUpdateDeleteView(APIView):
             updated_post = Posts.objects.update_post(post, serializer.validated_data)
             return Response(PostSerializer(updated_post).data)
         except:
-            Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
     def delete(self, request, pk):
@@ -71,4 +71,4 @@ class PostRetrieveUpdateDeleteView(APIView):
             post.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
-            Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
