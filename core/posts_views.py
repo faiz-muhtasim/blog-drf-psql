@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Posts
 from .serializers import PostSerializer
-from .manager import PostManager
+# from .manager import PostManager
 
 class PostListCreateView(APIView):
     """
@@ -15,14 +15,17 @@ class PostListCreateView(APIView):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = PostSerializer(data=request.data)
+    def post(self, request): 
+        try:
+            serializer = PostSerializer(data=request.data)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        post = PostManager.create_post(serializer.validated_data)
-        return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
+            post = Posts.objects.create_post(serializer.validated_data)
+            return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
+        except:
+            Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 
@@ -46,19 +49,26 @@ class PostRetrieveUpdateDeleteView(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        post = self.get_object(pk)
-        if not post:
-            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            post = self.get_object(pk)
+            if not post:
+                return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
-            updated_post = PostManager.update_post(post, serializer.validated_data)
+            serializer = PostSerializer(data=request.data)
+            if not serializer.is_valid(): 
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            updated_post = Posts.objects.update_post(post, serializer.validated_data)
             return Response(PostSerializer(updated_post).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
     def delete(self, request, pk):
-        post = self.get_object(pk)
-        if not post:
-            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
-        post.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            post = self.get_object(pk)
+            if not post:
+                return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+            post.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            Response("Something went wrong!!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)

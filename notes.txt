@@ -1,5 +1,5 @@
-utils -> choices -> move all choices
-try catch in views
-ekta if a error handling
+utils -> choices -> move all choices DONE
+try catch in views DONE
+ekta if a error handling DONE
 circular dependency in manager
-id dekhano output a
+id, created at, modified at dekhano output a DONE
