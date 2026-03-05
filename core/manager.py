@@ -3,6 +3,14 @@ from django.db import models
 from .utils.choices import POST_STATUS_CHOICES, POST_DRAFT
 
 class PostManager(models.Manager):
+    def get_all_posts(self):
+        return self.filter(is_deleted=False)
+
+    def get_post_by_id(self, pk):
+        try:
+            return self.get(pk=pk, is_deleted=False)
+        except self.model.DoesNotExist:
+            return None
     def create_post(self, validated_data):
         """
         Create a new post with the given validated data and user.
@@ -28,3 +36,8 @@ class PostManager(models.Manager):
         instance.status = validated_data.get('status', instance.status)
         instance.save()
         return instance
+    
+    @staticmethod
+    def delete_post(instance):
+        instance.is_deleted = True
+        instance.save()

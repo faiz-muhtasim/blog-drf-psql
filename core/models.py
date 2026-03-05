@@ -13,6 +13,7 @@ class Posts(models.Model):
     #     on_delete=models.CASCADE,
     #     related_name='posts'
     # )
+    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
