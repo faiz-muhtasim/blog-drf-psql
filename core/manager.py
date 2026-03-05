@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
-# from .models import Posts
+from django.db import models
 from .utils.choices import POST_STATUS_CHOICES, POST_DRAFT
 
-class PostManager:
+class PostManager(models.Manager):
     def create_post(self, validated_data):
         """
         Create a new post with the given validated data and user.
