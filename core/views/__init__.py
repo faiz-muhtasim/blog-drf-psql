@@ -1,0 +1,1 @@
+from .posts_views import PostListCreateView, PostRetrieveUpdateDeleteView
