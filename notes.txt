@@ -6,7 +6,7 @@
 6. otp mechanism 
 7. post view all comments
 8. keyword search
-9. serializer thik kora done
+9. serializer thik kora Done
 10.charfield vs text field
 
 Registration and Login:
