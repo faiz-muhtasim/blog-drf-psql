@@ -60,6 +60,7 @@ class PostManager(models.Manager):
 class CommentManager(models.Manager):
     def get_all_comments(self):
         return self.filter(is_deleted=False)
+
     def get_comment_by_id(self, pk):
         try:
             return self.get(pk=pk, is_deleted=False)
@@ -72,7 +73,7 @@ class CommentManager(models.Manager):
         )
     @staticmethod
     def update_comment(instance, validated_data):
-        instance.body = validated_data.get('body', instance.body)
+        instance.body = validated_data.get('body', instance.body) #change hbe
         instance.save()
         return instance
     @staticmethod

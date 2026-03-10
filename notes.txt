@@ -1,5 +1,6 @@
-utils -> choices -> move all choices DONE
-try catch in views DONE
-ekta if a error handling DONE
-circular dependency in manager
-id, created at, modified at dekhano output a DONE
+1. pagination -> utils
+2. manager bhag bhag korbo
+3. spacing thik thak
+4. manager a static gulo, self diye korar try korbo
+5. change in response in all http methods
+6. otp mechanism 
