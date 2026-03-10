@@ -2,6 +2,13 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from .utils.choices import POST_STATUS_CHOICES, POST_DRAFT
 
+
+def _soft_delete(instance):
+    """Mark an instance as deleted (soft delete)."""
+    instance.is_deleted = True
+    instance.save()
+
+
 class PostManager(models.Manager):
     def get_all_posts(self):
         return self.filter(is_deleted=False)
@@ -39,5 +46,27 @@ class PostManager(models.Manager):
     
     @staticmethod
     def delete_post(instance):
-        instance.is_deleted = True
+        _soft_delete(instance)
+
+#==================================================
+class CommentManager(models.Manager):
+    def get_all_comments(self):
+        return self.filter(is_deleted=False)
+    def get_comment_by_id(self, pk):
+        try:
+            return self.get(pk=pk, is_deleted=False)
+        except self.model.DoesNotExist:
+            return None
+    def create_comment(self, validated_data):
+        return self.create(
+            body=validated_data['body'],
+            post=validated_data['post']
+        )
+    @staticmethod
+    def update_comment(instance, validated_data):
+        instance.body = validated_data.get('body', instance.body)
         instance.save()
+        return instance
+    @staticmethod
+    def delete_comment(instance):
+        _soft_delete(instance)

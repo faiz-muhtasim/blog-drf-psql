@@ -9,3 +9,10 @@ class PostSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=POST_STATUS_CHOICES)
     created_at = serializers.DateTimeField(read_only=True)
     modified_at = serializers.DateTimeField(read_only=True)
+
+class CommentSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    post = serializers.PrimaryKeyRelatedField(queryset=Posts.objects.all())
+    body = serializers.CharField()
+    created_at = serializers.DateTimeField(read_only=True)
+    modified_at = serializers.DateTimeField(read_only=True)

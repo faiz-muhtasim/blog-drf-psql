@@ -1,0 +1,2 @@
+from .posts_views import PostListCreateView, PostRetrieveUpdateDeleteView
+from .comment_views import CommentListCreateView, CommentRetrieveUpdateDeleteView

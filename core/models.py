@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from .utils.choices import POST_STATUS_CHOICES, POST_DRAFT
-from .manager import PostManager
+from .manager import PostManager, CommentManager
 
 class Posts(models.Model):
 
@@ -21,3 +21,16 @@ class Posts(models.Model):
 
     def __str__(self):
         return self.title
+
+class Comments(models.Model):
+    post = models.ForeignKey(
+        Posts,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    body = models.TextField()
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    objects = CommentManager()

@@ -1,16 +1,21 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Posts
-from .serializers import PostSerializer
+from ..models import Posts
+from ..serializers import PostSerializer
+from ..pagination import CustomLimitOffsetPagination
 # from .manager import PostManager
 
 class PostListCreateView(APIView):
+    pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
         posts = Posts.objects.get_all_posts()
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        print(len(posts))
+        paginator = self.pagination_class
+        page = paginator.paginate_queryset(posts, request, view=self)
+        serializer = PostSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         try:
