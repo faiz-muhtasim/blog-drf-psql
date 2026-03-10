@@ -14,6 +14,7 @@ class CommentListCreateView(APIView):
         page = paginator.paginate_queryset(comments, request, view=self)
         serializer = CommentSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
     def post(self, request):
         try:
             serializer = CommentSerializer(data=request.data)
@@ -25,11 +26,13 @@ class CommentListCreateView(APIView):
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CommentRetrieveUpdateDeleteView(APIView):
+
     def get(self, request, pk):
         comment = Comments.objects.get_comment_by_id(pk)
         if not comment:
             return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(CommentSerializer(comment).data)
+
     def put(self, request, pk):
         try:
             comment = Comments.objects.get_comment_by_id(pk)
@@ -42,6 +45,7 @@ class CommentRetrieveUpdateDeleteView(APIView):
             return Response(CommentSerializer(updated_comment).data)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def delete(self, request, pk):
         try:
             comment = Comments.objects.get_comment_by_id(pk)
