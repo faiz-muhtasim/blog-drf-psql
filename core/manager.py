@@ -8,7 +8,7 @@ from django.utils import timezone
 from .utils.choices import POST_STATUS_CHOICES, POST_DRAFT
 
 # Default OTP validity in minutes
-OTP_EXPIRY_MINUTES = 15
+OTP_EXPIRY_MINUTES = 2
 
 
 def _soft_delete(instance):
