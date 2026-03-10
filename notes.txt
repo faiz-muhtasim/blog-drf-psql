@@ -4,3 +4,22 @@
 4. manager a static gulo, self diye korar try korbo
 5. change in response in all http methods
 6. otp mechanism 
+7. post view all comments
+8. keyword search
+
+Registration and Login:
+●A non registered user will be able to register
+●OTP will be sent to email to active a brand new account 
+●Using correct credentials(email & pass) a registered user will be able to log in
+●Have to use JWT authentication
+●Have to implement password reset functionality
+●Valid user(email) will request for pass reset and an OTP will be sent to user’s email,
+using that OTP new pass will be saved
+
+
+● Only registered user will be able to create a post
+● Only owner of the post have the right to edit or delete that post
+
+
+●Only a logged in user can create a comment against a post
+●Owner of a comment can edit and delete that comment
