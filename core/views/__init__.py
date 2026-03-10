@@ -1,2 +1,3 @@
 from .posts_views import PostListCreateView, PostRetrieveUpdateDeleteView
 from .comment_views import CommentListCreateView, CommentRetrieveUpdateDeleteView
+from .otp_views import OTPListCreateView, OTPVerifyView, OTPRetrieveDeleteView
