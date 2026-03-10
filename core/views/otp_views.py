@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..models import OTP
 from ..serializers import OTPSerializer, OTPVerifySerializer
-from ..pagination import CustomLimitOffsetPagination
+from core.utils.pagination import CustomLimitOffsetPagination
 
 
 class OTPListCreateView(APIView):

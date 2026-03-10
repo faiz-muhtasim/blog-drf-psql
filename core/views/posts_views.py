@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..models import Posts
 from ..serializers import PostSerializer
-from ..pagination import CustomLimitOffsetPagination
+from core.utils.pagination import CustomLimitOffsetPagination
 # from .manager import PostManager
 
 class PostListCreateView(APIView):

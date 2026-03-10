@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from ..models import Comments
-from ..serializers import CommentSerializer
-from ..pagination import CustomLimitOffsetPagination
+from core.serializers import CommentSerializer
+from core.utils.pagination import CustomLimitOffsetPagination
 
 class CommentListCreateView(APIView):
     pagination_class = CustomLimitOffsetPagination()

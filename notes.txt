@@ -1,4 +1,4 @@
-1. pagination -> utils
+1. pagination -> utils Done
 2. manager bhag bhag korbo
 3. spacing thik thak
 4. manager a static gulo, self diye korar try korbo
