@@ -30,8 +30,24 @@ class CommentRetrieveUpdateDeleteView(APIView):
     def get(self, request, pk):
         comment = Comments.objects.get_comment_by_id(pk)
         if not comment:
-            return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
-        return Response(CommentSerializer(comment).data)
+            return Response(
+                {
+                    "success": False,
+                    "code": 404,
+                    "message": "Comment not found",
+                    "data": None,
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            {
+                "data": CommentSerializer(comment).data,
+                "success": True,
+                "code": 200,
+                "message": "Comment fetched successfully"
+            },
+            status=status.HTTP_200_OK
+        )
 
     def put(self, request, pk):
         try:

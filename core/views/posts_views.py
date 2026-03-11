@@ -33,8 +33,24 @@ class PostRetrieveUpdateDeleteView(APIView):
     def get(self, request, pk):
         post = Posts.objects.get_post_by_id(pk)
         if not post:
-            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
-        return Response(PostSerializer(post).data)
+            return Response(
+                {
+                    "success": False,
+                    "code": 404,
+                    "message": "Post not found",
+                    "data": None,
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            {
+                "success": True,
+                "code": 200,
+                "message": "Post fetched successfully",
+                "data": PostSerializer(post).data,
+            },
+            status=status.HTTP_200_OK
+        )
 
     def put(self, request, pk):
         try:

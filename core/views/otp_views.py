@@ -54,8 +54,24 @@ class OTPRetrieveDeleteView(APIView):
     def get(self, request, pk):
         otp = OTP.objects.get_otp_by_id(pk)
         if not otp:
-            return Response({"error": "OTP not found"}, status=status.HTTP_404_NOT_FOUND)
-        return Response(OTPSerializer(otp).data)
+            return Response(
+                {
+                    "success": False,
+                    "code": 404,
+                    "message": "OTP not found",
+                    "data": None,
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            {
+                "success": True,
+                "code": 200,
+                "message": "OTP fetched successfully",
+                "data": OTPSerializer(otp).data,
+            },
+            status=status.HTTP_200_OK
+        )
 
     def delete(self, request, pk):
         try:

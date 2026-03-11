@@ -2,7 +2,7 @@
 2. manager bhag bhag korbo
 3. spacing thik thak Done
 4. manager a static gulo, self diye korar try korbo
-5. change in response in all http methods
+5. change in response in get http methods Done
 6. otp mechanism 
 7. post view all comments
 8. keyword search
