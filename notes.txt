@@ -1,8 +1,7 @@
 1. get thik korsi, baki method gula serializer chara pass korbo
-
 2. otp mechanism
 3. mail service
-7. post view all comments
+7. response thik kora (when there is nothing to show)
 8. keyword search
 
 
