@@ -1,13 +1,10 @@
-1. pagination -> utils Done
-2. manager bhag bhag korbo Done
-3. spacing thik thak Done
-4. manager a static gulo, self diye korar try korbo Done
-5. change in response in all http methods Done
-6. otp mechanism 
+1. get thik korsi, baki method gula serializer chara pass korbo
+
+2. otp mechanism
+3. mail service
 7. post view all comments
 8. keyword search
-9. serializer thik kora Done
-10.charfield vs text field Done
+
 
 Registration and Login:
 ●A non registered user will be able to register
