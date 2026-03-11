@@ -11,11 +11,10 @@ class CommentListCreateView(APIView):
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
-        comments = Comments.objects.get_all_comments()
+        comments = Comments.objects.get_all_comments().values()
         paginator = self.pagination_class
         page = paginator.paginate_queryset(comments, request, view=self)
-        serializer = CommentSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(list(page))
 
     def post(self, request):
         try:
@@ -31,10 +30,10 @@ class CommentListCreateView(APIView):
 class CommentRetrieveUpdateDeleteView(APIView):
 
     def get(self, request, pk):
-        comment = Comments.objects.get_comment_by_id(pk)
+        comment = Comments.objects.filter(pk=pk, is_deleted=False).values().first()
         if not comment:
             return Response(error_response(message="Comment not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(CommentSerializer(comment).data, "Comment fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(comment, "Comment fetched successfully"), status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         try:

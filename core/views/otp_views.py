@@ -11,11 +11,10 @@ class OTPListCreateView(APIView):
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
-        otps = OTP.objects.get_all_otps()
+        otps = OTP.objects.get_all_otps().values()
         paginator = self.pagination_class
         page = paginator.paginate_queryset(otps, request, view=self)
-        serializer = OTPSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(list(page))
 
     def post(self, request):
         try:
@@ -50,10 +49,10 @@ class OTPRetrieveDeleteView(APIView):
     """GET and DELETE only. No update — use verify endpoint to consume OTP."""
 
     def get(self, request, pk):
-        otp = OTP.objects.get_otp_by_id(pk)
+        otp = OTP.objects.filter(pk=pk, is_deleted=False).values().first()
         if not otp:
             return Response(error_response(message="OTP not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(OTPSerializer(otp).data, "OTP fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(otp, "OTP fetched successfully"), status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         try:

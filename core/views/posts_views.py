@@ -11,12 +11,11 @@ class PostListCreateView(APIView):
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
-        posts = Posts.objects.get_all_posts()
-        print(len(posts))
+        posts = Posts.objects.get_all_posts().values()
+        print(posts.count())
         paginator = self.pagination_class
         page = paginator.paginate_queryset(posts, request, view=self)
-        serializer = PostSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(list(page))
 
     def post(self, request):
         try:
@@ -32,10 +31,10 @@ class PostListCreateView(APIView):
 class PostRetrieveUpdateDeleteView(APIView):
 
     def get(self, request, pk):
-        post = Posts.objects.get_post_by_id(pk)
+        post = Posts.objects.filter(pk=pk, is_deleted=False).values().first()
         if not post:
             return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(PostSerializer(post).data, "Post fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(post, "Post fetched successfully"), status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         try:
