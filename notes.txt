@@ -1,7 +1,7 @@
 1. pagination -> utils Done
-2. manager bhag bhag korbo
+2. manager bhag bhag korbo Done
 3. spacing thik thak Done
-4. manager a static gulo, self diye korar try korbo
+4. manager a static gulo, self diye korar try korbo Done
 5. change in response in all http methods Done
 6. otp mechanism 
 7. post view all comments
