@@ -5,7 +5,7 @@ from ..utils.choices import POST_DRAFT
 
 class PostManager(models.Manager):
     def get_all_posts(self):
-        return self.filter(is_deleted=False)
+        return self.filter(is_deleted=False).prefetch_related('comments')
 
     def get_post_by_id(self, pk):
         try:
@@ -35,4 +35,5 @@ class PostManager(models.Manager):
         if instance is None:
             return False
         _soft_delete(instance)
+        instance.comments.filter(is_deleted=False).update(is_deleted=True)
         return True

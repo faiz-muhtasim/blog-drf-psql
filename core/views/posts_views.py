@@ -11,11 +11,21 @@ class PostListCreateView(APIView):
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
-        posts = Posts.objects.get_all_posts().values()
-        print(posts.count())
+        posts = Posts.objects.get_all_posts()
         paginator = self.pagination_class
         page = paginator.paginate_queryset(posts, request, view=self)
-        return paginator.get_paginated_response(page)
+
+        data = []
+        for post in page:
+            data.append({
+                'id': post.id,
+                'title': post.title,
+                'description': post.description,
+                'status': post.status,
+                'comments': list(post.comments.filter(is_deleted=False).values('id', 'body', 'created_at'))
+            })
+
+        return paginator.get_paginated_response(data)
 
     def post(self, request):
         try:
@@ -31,10 +41,17 @@ class PostListCreateView(APIView):
 class PostRetrieveUpdateDeleteView(APIView):
 
     def get(self, request, pk):
-        post = Posts.objects.filter(pk=pk, is_deleted=False).values().first()
+        post = Posts.objects.get_post_by_id(pk)
         if not post:
             return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(post, "Post fetched successfully"), status=status.HTTP_200_OK)
+        data = {
+            'id': post.id,
+            'title': post.title,
+            'description': post.description,
+            'status': post.status,
+            'comments': list(post.comments.filter(is_deleted=False).values('id', 'body', 'created_at'))
+        }
+        return Response(success_response(data, "Post fetched successfully"), status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         try:
