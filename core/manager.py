@@ -40,21 +40,22 @@ class PostManager(models.Manager):
             status=validated_data.get('status', POST_DRAFT)
         )
 
-    @staticmethod
-    def update_post(instance, validated_data):
-        """
-        Update an existing post with validated data.
-        Only updates fields provided in validated_data.
-        """
+    def update_post(self, pk, validated_data):
+        instance = self.get_post_by_id(pk)
+        if instance is None:
+            return None
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.status = validated_data.get('status', instance.status)
         instance.save()
         return instance
-    
-    @staticmethod
-    def delete_post(instance):
+
+    def delete_post(self, pk):
+        instance = self.get_post_by_id(pk)
+        if instance is None:
+            return False
         _soft_delete(instance)
+        return True
 
 #==================================================
 class CommentManager(models.Manager):
@@ -71,14 +72,21 @@ class CommentManager(models.Manager):
             body=validated_data['body'],
             post=validated_data['post']
         )
-    @staticmethod
-    def update_comment(instance, validated_data):
-        instance.body = validated_data.get('body', instance.body) #change hbe
+
+    def update_comment(self, pk, validated_data):
+        instance = self.get_comment_by_id(pk)
+        if instance is None:
+            return None
+        instance.body = validated_data.get('body', instance.body)
         instance.save()
         return instance
-    @staticmethod
-    def delete_comment(instance):
+
+    def delete_comment(self, pk):
+        instance = self.get_comment_by_id(pk)
+        if instance is None:
+            return False
         _soft_delete(instance)
+        return True
 #==================================================
 class OTPManager(models.Manager):
     def get_all_otps(self):
@@ -118,13 +126,17 @@ class OTPManager(models.Manager):
             qs = qs.filter(task_type=task_type)
         return qs.first()
 
-    @staticmethod
-    def mark_otp_used(instance):
-        """Mark an OTP as used after successful verification."""
+    def mark_otp_used(self, pk):
+        instance = self.get_otp_by_id(pk)
+        if instance is None:
+            return None
         instance.has_used = True
         instance.save()
         return instance
 
-    @staticmethod
-    def delete_otp(instance):
+    def delete_otp(self, pk):
+        instance = self.get_otp_by_id(pk)
+        if instance is None:
+            return False
         _soft_delete(instance)
+        return True

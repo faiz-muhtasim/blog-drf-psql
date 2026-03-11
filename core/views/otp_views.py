@@ -28,7 +28,6 @@ class OTPListCreateView(APIView):
 
 
 class OTPVerifyView(APIView):
-    """Verify an OTP and mark it as used. Use this instead of updating OTP."""
 
     def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)
@@ -41,25 +40,23 @@ class OTPVerifyView(APIView):
         )
         if not otp_instance:
             return Response(error_response(message="Invalid, expired, or already used OTP", code=400), status=status.HTTP_400_BAD_REQUEST)
-        OTP.objects.mark_otp_used(otp_instance)
+        OTP.objects.mark_otp_used(otp_instance.pk)  # pass pk, not instance
         return Response(success_response(message="OTP verified successfully"), status=status.HTTP_200_OK)
 
 
 class OTPRetrieveDeleteView(APIView):
-    """GET and DELETE only. No update — use verify endpoint to consume OTP."""
 
     def get(self, request, pk):
-        otp = OTP.objects.filter(pk=pk, is_deleted=False).values().first()
+        otp = OTP.objects.get_otp_by_id(pk)  # use manager, not .filter()
         if not otp:
             return Response(error_response(message="OTP not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(otp, "OTP fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(OTPSerializer(otp).data, "OTP fetched successfully"), status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         try:
-            otp = OTP.objects.get_otp_by_id(pk)
-            if not otp:
+            deleted = OTP.objects.delete_otp(pk)
+            if not deleted:
                 return Response(error_response(message="OTP not found", code=404), status=status.HTTP_404_NOT_FOUND)
-            OTP.objects.delete_otp(otp)
             return Response(success_response(message="OTP deleted successfully", code=204), status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

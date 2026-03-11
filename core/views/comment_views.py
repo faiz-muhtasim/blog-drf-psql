@@ -30,30 +30,28 @@ class CommentListCreateView(APIView):
 class CommentRetrieveUpdateDeleteView(APIView):
 
     def get(self, request, pk):
-        comment = Comments.objects.filter(pk=pk, is_deleted=False).values().first()
+        comment = Comments.objects.get_comment_by_id(pk)  # use manager, not .filter()
         if not comment:
             return Response(error_response(message="Comment not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(comment, "Comment fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(CommentSerializer(comment).data, "Comment fetched successfully"), status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         try:
-            comment = Comments.objects.get_comment_by_id(pk)
-            if not comment:
-                return Response(error_response(message="Comment not found", code=404), status=status.HTTP_404_NOT_FOUND)
             serializer = CommentSerializer(data=request.data, partial=True)
             if not serializer.is_valid():
                 return Response(error_response(serializer.errors, "Validation error", 400), status=status.HTTP_400_BAD_REQUEST)
-            updated_comment = Comments.objects.update_comment(comment, serializer.validated_data)
+            updated_comment = Comments.objects.update_comment(pk, serializer.validated_data)
+            if not updated_comment:
+                return Response(error_response(message="Comment not found", code=404), status=status.HTTP_404_NOT_FOUND)
             return Response(success_response(CommentSerializer(updated_comment).data, "Comment updated successfully"), status=status.HTTP_200_OK)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request, pk):
         try:
-            comment = Comments.objects.get_comment_by_id(pk)
-            if not comment:
+            deleted = Comments.objects.delete_comment(pk)
+            if not deleted:
                 return Response(error_response(message="Comment not found", code=404), status=status.HTTP_404_NOT_FOUND)
-            Comments.objects.delete_comment(comment)
             return Response(success_response(message="Comment deleted successfully", code=204), status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

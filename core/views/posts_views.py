@@ -38,23 +38,24 @@ class PostRetrieveUpdateDeleteView(APIView):
 
     def put(self, request, pk):
         try:
-            post = Posts.objects.get_post_by_id(pk)
-            if not post:
-                return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
             serializer = PostSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(error_response(serializer.errors, "Validation error", 400), status=status.HTTP_400_BAD_REQUEST)
-            updated_post = Posts.objects.update_post(post, serializer.validated_data)
-            return Response(success_response(PostSerializer(updated_post).data, "Post updated successfully"), status=status.HTTP_200_OK)
+                return Response(error_response(serializer.errors, "Validation error", 400),
+                                status=status.HTTP_400_BAD_REQUEST)
+            updated_post = Posts.objects.update_post(pk, serializer.validated_data)
+            if not updated_post:
+                return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
+            return Response(success_response(PostSerializer(updated_post).data, "Post updated successfully"),
+                            status=status.HTTP_200_OK)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request, pk):
         try:
-            post = Posts.objects.get_post_by_id(pk)
-            if not post:
+            deleted = Posts.objects.delete_post(pk)
+            if not deleted:
                 return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
-            Posts.objects.delete_post(post)
-            return Response(success_response(message="Post deleted successfully", code=204), status=status.HTTP_204_NO_CONTENT)
+            return Response(success_response(message="Post deleted successfully", code=204),
+                            status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

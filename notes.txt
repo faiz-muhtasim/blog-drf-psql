@@ -7,7 +7,7 @@
 7. post view all comments
 8. keyword search
 9. serializer thik kora Done
-10.charfield vs text field
+10.charfield vs text field Done
 
 Registration and Login:
 ●A non registered user will be able to register
