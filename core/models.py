@@ -20,8 +20,6 @@ class Posts(models.Model):
 
     objects = PostManager()
 
-    def __str__(self):
-        return self.title
 
 class Comments(models.Model):
     post = models.ForeignKey(

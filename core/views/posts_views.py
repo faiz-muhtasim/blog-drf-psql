@@ -15,7 +15,7 @@ class PostListCreateView(APIView):
         print(posts.count())
         paginator = self.pagination_class
         page = paginator.paginate_queryset(posts, request, view=self)
-        return paginator.get_paginated_response(list(page))
+        return paginator.get_paginated_response(page)
 
     def post(self, request):
         try:

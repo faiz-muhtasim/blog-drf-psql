@@ -14,7 +14,7 @@ class OTPListCreateView(APIView):
         otps = OTP.objects.get_all_otps().values()
         paginator = self.pagination_class
         page = paginator.paginate_queryset(otps, request, view=self)
-        return paginator.get_paginated_response(list(page))
+        return paginator.get_paginated_response(page)
 
     def post(self, request):
         try:

@@ -10,7 +10,7 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
             "count": self.count,
             "limit": self.limit,
             "offset": self.offset,
-            "results": data,
+            "results": list(data),
             "response_status": {
                 "success": "true",
                 "code": 200,

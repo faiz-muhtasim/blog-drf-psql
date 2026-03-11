@@ -14,7 +14,7 @@ class CommentListCreateView(APIView):
         comments = Comments.objects.get_all_comments().values()
         paginator = self.pagination_class
         page = paginator.paginate_queryset(comments, request, view=self)
-        return paginator.get_paginated_response(list(page))
+        return paginator.get_paginated_response(page)
 
     def post(self, request):
         try:
