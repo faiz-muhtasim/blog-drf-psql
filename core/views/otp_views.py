@@ -20,11 +20,41 @@ class OTPListCreateView(APIView):
         try:
             serializer = OTPSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "data": serializer.errors,
+                        "response_status": {
+                            "success": False,
+                            "code": 400,
+                            "message": "Validation error",
+                        },
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             otp = OTP.objects.create_otp(serializer.validated_data)
-            return Response(OTPSerializer(otp).data, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "data": OTPSerializer(otp).data,
+                    "response_status": {
+                        "success": True,
+                        "code": 201,
+                        "message": "OTP created successfully",
+                    },
+                },
+                status=status.HTTP_201_CREATED
+            )
         except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 500,
+                        "message": str(e),
+                    },
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class OTPVerifyView(APIView):
@@ -33,7 +63,17 @@ class OTPVerifyView(APIView):
     def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "data": serializer.errors,
+                    "response_status": {
+                        "success": False,
+                        "code": 400,
+                        "message": "Validation error",
+                    },
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         data = serializer.validated_data
         otp_instance = OTP.objects.get_otp_by_code(
             otp_code=data["otp"],
@@ -41,11 +81,28 @@ class OTPVerifyView(APIView):
         )
         if not otp_instance:
             return Response(
-                {"error": "Invalid, expired, or already used OTP"},
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 400,
+                        "message": "Invalid, expired, or already used OTP",
+                    },
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         OTP.objects.mark_otp_used(otp_instance)
-        return Response({"message": "OTP verified successfully"})
+        return Response(
+            {
+                "data": None,
+                "response_status": {
+                    "success": True,
+                    "code": 200,
+                    "message": "OTP verified successfully",
+                },
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class OTPRetrieveDeleteView(APIView):
@@ -56,19 +113,23 @@ class OTPRetrieveDeleteView(APIView):
         if not otp:
             return Response(
                 {
-                    "success": False,
-                    "code": 404,
-                    "message": "OTP not found",
                     "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 404,
+                        "message": "OTP not found",
+                    },
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
         return Response(
             {
-                "success": True,
-                "code": 200,
-                "message": "OTP fetched successfully",
                 "data": OTPSerializer(otp).data,
+                "response_status": {
+                    "success": True,
+                    "code": 200,
+                    "message": "OTP fetched successfully",
+                },
             },
             status=status.HTTP_200_OK
         )
@@ -78,9 +139,37 @@ class OTPRetrieveDeleteView(APIView):
             otp = OTP.objects.get_otp_by_id(pk)
             if not otp:
                 return Response(
-                    {"error": "OTP not found"}, status=status.HTTP_404_NOT_FOUND
+                    {
+                        "data": None,
+                        "response_status": {
+                            "success": False,
+                            "code": 404,
+                            "message": "OTP not found",
+                        },
+                    },
+                    status=status.HTTP_404_NOT_FOUND
                 )
             OTP.objects.delete_otp(otp)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": True,
+                        "code": 204,
+                        "message": "OTP deleted successfully",
+                    },
+                },
+                status=status.HTTP_204_NO_CONTENT
+            )
         except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 500,
+                        "message": str(e),
+                    },
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

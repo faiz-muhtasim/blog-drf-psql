@@ -19,11 +19,41 @@ class CommentListCreateView(APIView):
         try:
             serializer = CommentSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "data": serializer.errors,
+                        "response_status": {
+                            "success": False,
+                            "code": 400,
+                            "message": "Validation error",
+                        },
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             comment = Comments.objects.create_comment(serializer.validated_data)
-            return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "data": CommentSerializer(comment).data,
+                    "response_status": {
+                        "success": True,
+                        "code": 201,
+                        "message": "Comment created successfully",
+                    },
+                },
+                status=status.HTTP_201_CREATED
+            )
         except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 500,
+                        "message": str(e),
+                    },
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class CommentRetrieveUpdateDeleteView(APIView):
 
@@ -32,19 +62,23 @@ class CommentRetrieveUpdateDeleteView(APIView):
         if not comment:
             return Response(
                 {
-                    "success": False,
-                    "code": 404,
-                    "message": "Comment not found",
                     "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 404,
+                        "message": "Comment not found",
+                    },
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
         return Response(
             {
                 "data": CommentSerializer(comment).data,
-                "success": True,
-                "code": 200,
-                "message": "Comment fetched successfully"
+                "response_status": {
+                    "success": True,
+                    "code": 200,
+                    "message": "Comment fetched successfully",
+                },
             },
             status=status.HTTP_200_OK
         )
@@ -53,21 +87,91 @@ class CommentRetrieveUpdateDeleteView(APIView):
         try:
             comment = Comments.objects.get_comment_by_id(pk)
             if not comment:
-                return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {
+                        "data": None,
+                        "response_status": {
+                            "success": False,
+                            "code": 404,
+                            "message": "Comment not found",
+                        },
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
             serializer = CommentSerializer(data=request.data, partial=True)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "data": serializer.errors,
+                        "response_status": {
+                            "success": False,
+                            "code": 400,
+                            "message": "Validation error",
+                        },
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             updated_comment = Comments.objects.update_comment(comment, serializer.validated_data)
-            return Response(CommentSerializer(updated_comment).data)
+            return Response(
+                {
+                    "data": CommentSerializer(updated_comment).data,
+                    "response_status": {
+                        "success": True,
+                        "code": 200,
+                        "message": "Comment updated successfully",
+                    },
+                },
+                status=status.HTTP_200_OK
+            )
         except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 500,
+                        "message": str(e),
+                    },
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def delete(self, request, pk):
         try:
             comment = Comments.objects.get_comment_by_id(pk)
             if not comment:
-                return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {
+                        "data": None,
+                        "response_status": {
+                            "success": False,
+                            "code": 404,
+                            "message": "Comment not found",
+                        },
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
             Comments.objects.delete_comment(comment)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": True,
+                        "code": 204,
+                        "message": "Comment deleted successfully",
+                    },
+                },
+                status=status.HTTP_204_NO_CONTENT
+            )
         except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "data": None,
+                    "response_status": {
+                        "success": False,
+                        "code": 500,
+                        "message": str(e),
+                    },
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
