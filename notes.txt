@@ -1,9 +1,7 @@
 1. get thik korsi, baki method gula serializer chara pass korbo
-2. otp mechanism
-3. mail service
-7. response thik kora (when there is nothing to show)
-
-
+5. response thik kora (when there is nothing to show)response a data shudhu get a rakhbo
+3. built in user table use korbo?
+4. constants gulo env te nite hbe
 
 Registration and Login:
 ●A non registered user will be able to register
@@ -21,3 +19,6 @@ using that OTP new pass will be saved
 
 ●Only a logged in user can create a comment against a post
 ●Owner of a comment can edit and delete that comment
+
+2. otp mechanism
+3. mail service
