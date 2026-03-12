@@ -2,7 +2,7 @@
 2. otp mechanism
 3. mail service
 7. response thik kora (when there is nothing to show)
-8. keyword search
+
 
 
 Registration and Login:

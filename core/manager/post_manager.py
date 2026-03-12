@@ -1,6 +1,7 @@
 from django.db import models
 from .base import _soft_delete
 from ..utils.choices import POST_DRAFT
+from django.db.models import Q
 
 
 class PostManager(models.Manager):
@@ -37,3 +38,8 @@ class PostManager(models.Manager):
         _soft_delete(instance)
         instance.comments.filter(is_deleted=False).update(is_deleted=True)
         return True
+    def search_posts(self, keyword):
+        return self.filter(
+            Q(title__icontains=keyword) | Q(description__icontains=keyword),
+            is_deleted=False
+    )
