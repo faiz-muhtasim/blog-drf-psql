@@ -3,6 +3,8 @@
 3. built in user table use korbo?
 4. constants gulo env te nite hbe
 
+ response msg a list ante hbe, baki gulo muche dibo
+
 Registration and Login:
 ●A non registered user will be able to register
 ●OTP will be sent to email to active a brand new account 
@@ -22,3 +24,4 @@ using that OTP new pass will be saved
 
 2. otp mechanism
 3. mail service
+6. otp success msg edit

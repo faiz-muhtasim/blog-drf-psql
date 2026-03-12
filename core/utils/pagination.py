@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
@@ -10,10 +11,10 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
             "count": self.count,
             "limit": self.limit,
             "offset": self.offset,
-            "results": list(data),
+            "data": list(data),
             "response_status": {
-                "success": "true",
-                "code": 200,
-                "message": "message fetched successfully",
+                "success": True,
+                "code": status.HTTP_200_OK,
+                "message": "Data fetched successfully",
             }
         })

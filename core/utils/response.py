@@ -12,7 +12,6 @@ def success_response(data=None, message="Success", code=200):
 
 def error_response(data=None, message="Error", code=400):
     return {
-        "data": data,
         "response_status": {
             "success": False,
             "code": code,
