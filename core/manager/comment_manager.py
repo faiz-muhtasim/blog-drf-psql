@@ -13,9 +13,14 @@ class CommentManager(models.Manager):
             return None
 
     def create_comment(self, validated_data):
+        post = validated_data['post']
+
+        if post.is_deleted:  # replace with your actual soft-delete field
+            raise ValueError("Cannot comment on a deleted post")
+
         return self.create(
             body=validated_data['body'],
-            post=validated_data['post']
+            post=post
         )
 
     def update_comment(self, pk, validated_data):
