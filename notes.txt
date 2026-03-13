@@ -1,5 +1,5 @@
 1. get thik korsi, baki method gula serializer chara pass korbo
-5. response thik kora (when there is nothing to show)response a data shudhu get a rakhbo
+5. response thik kora (get chara data pass korbo na) Done
 3. built in user table use korbo? extra info thakbe
 4. constants gulo env te nite hbe
 
