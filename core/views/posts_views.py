@@ -12,12 +12,14 @@ class PostListCreateView(APIView):
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
+
         keyword = request.query_params.get('search', None)
 
         if keyword:
             posts = Posts.objects.search_posts(keyword)
         else:
             posts = Posts.objects.get_all_posts()
+
         paginator = self.pagination_class
         page = paginator.paginate_queryset(posts, request, view=self)
 
