@@ -8,6 +8,7 @@ from core.utils.response import success_response, error_response
 
 
 class CommentListCreateView(APIView):
+
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
@@ -30,10 +31,11 @@ class CommentListCreateView(APIView):
 class CommentRetrieveUpdateDeleteView(APIView):
 
     def get(self, request, pk):
-        comment = Comments.objects.get_comment_by_id(pk)  # use manager, not .filter()
+        comment = Comments.objects.get_comment_by_id(pk) # use manager, not .filter()
         if not comment:
             return Response(error_response(message="Comment not found", code=404), status=status.HTTP_404_NOT_FOUND)
-        return Response(success_response(CommentSerializer(comment).data, "Comment fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(CommentSerializer(comment).data, "Comment fetched successfully", include_data=True),
+                        status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         try:

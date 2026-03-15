@@ -8,6 +8,7 @@ from core.utils.response import success_response, error_response
 
 
 class PostListCreateView(APIView):
+
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
@@ -56,7 +57,7 @@ class PostRetrieveUpdateDeleteView(APIView):
             'status': post.status,
             'comments': list(post.comments.filter(is_deleted=False).values('id', 'body', 'created_at'))
         }
-        return Response(success_response(data, "Post fetched successfully"), status=status.HTTP_200_OK)
+        return Response(success_response(data, "Post fetched successfully", include_data=True), status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         try:
