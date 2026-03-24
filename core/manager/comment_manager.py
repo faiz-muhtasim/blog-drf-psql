@@ -12,13 +12,14 @@ class CommentManager(models.Manager):
         except self.model.DoesNotExist:
             return None
 
-    def create_comment(self, validated_data):
+    def create_comment(self, validated_data, user):         # 👈 added user param
         post = validated_data['post']
 
-        if post.is_deleted:  # replace with your actual soft-delete field
+        if post.is_deleted:
             raise ValueError("Cannot comment on a deleted post")
 
         return self.create(
+            user=user,                                      # 👈 save user
             body=validated_data['body'],
             post=post
         )
