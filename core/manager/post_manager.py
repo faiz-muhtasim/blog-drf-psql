@@ -14,8 +14,9 @@ class PostManager(models.Manager):
         except self.model.DoesNotExist:
             return None
 
-    def create_post(self, validated_data):
+    def create_post(self, validated_data, user):          # 👈 added user param
         return self.create(
+            user=user,                                     # 👈 save user
             title=validated_data['title'],
             description=validated_data['description'],
             status=validated_data.get('status', POST_DRAFT)

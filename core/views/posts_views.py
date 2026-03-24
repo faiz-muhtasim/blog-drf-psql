@@ -7,6 +7,7 @@ from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+
 class PostListCreateView(APIView):
 
     pagination_class = CustomLimitOffsetPagination()
@@ -16,9 +17,7 @@ class PostListCreateView(APIView):
             return [AllowAny()]
         return [IsAuthenticated()]
 
-
     def get(self, request):
-
         keyword = request.query_params.get('search', None)
 
         if keyword:
@@ -46,13 +45,14 @@ class PostListCreateView(APIView):
             serializer = PostSerializer(data=request.data)
             if not serializer.is_valid():
                 return Response(error_response(serializer.errors, "Validation error", 400), status=status.HTTP_400_BAD_REQUEST)
-            post = Posts.objects.create_post(serializer.validated_data)
+            post = Posts.objects.create_post(serializer.validated_data, user=request.user)  # 👈 pass user
             return Response(success_response(PostSerializer(post).data, "Post created successfully", 201), status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PostRetrieveUpdateDeleteView(APIView):
+
     def get_permissions(self):
         if self.request.method == 'GET':
             return [AllowAny()]
@@ -73,24 +73,29 @@ class PostRetrieveUpdateDeleteView(APIView):
 
     def put(self, request, pk):
         try:
+            post = Posts.objects.get_post_by_id(pk)                           # 👈 fetch first
+            if not post:
+                return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
+            if post.user != request.user:                                      # 👈 ownership check
+                return Response(error_response(message="You are not allowed to edit this post", code=403), status=status.HTTP_403_FORBIDDEN)
+
             serializer = PostSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(error_response(serializer.errors, "Validation error", 400),
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(error_response(serializer.errors, "Validation error", 400), status=status.HTTP_400_BAD_REQUEST)
             updated_post = Posts.objects.update_post(pk, serializer.validated_data)
-            if not updated_post:
-                return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
-            return Response(success_response(PostSerializer(updated_post).data, "Post updated successfully"),
-                            status=status.HTTP_200_OK)
+            return Response(success_response(PostSerializer(updated_post).data, "Post updated successfully"), status=status.HTTP_200_OK)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request, pk):
         try:
-            deleted = Posts.objects.delete_post(pk)
-            if not deleted:
+            post = Posts.objects.get_post_by_id(pk)                           # 👈 fetch first
+            if not post:
                 return Response(error_response(message="Post not found", code=404), status=status.HTTP_404_NOT_FOUND)
-            return Response(success_response(message="Post deleted successfully", code=204),
-                            status=status.HTTP_204_NO_CONTENT)
+            if post.user != request.user:                                      # 👈 ownership check
+                return Response(error_response(message="You are not allowed to delete this post", code=403), status=status.HTTP_403_FORBIDDEN)
+
+            Posts.objects.delete_post(pk)
+            return Response(success_response(message="Post deleted successfully", code=204), status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
