@@ -5,11 +5,17 @@ from ..models import Posts
 from ..serializers import PostSerializer
 from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class PostListCreateView(APIView):
 
     pagination_class = CustomLimitOffsetPagination()
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
 
     def get(self, request):
 
@@ -47,6 +53,10 @@ class PostListCreateView(APIView):
 
 
 class PostRetrieveUpdateDeleteView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request, pk):
         post = Posts.objects.get_post_by_id(pk)

@@ -5,9 +5,11 @@ from ..models import Comments
 from core.serializers import CommentSerializer
 from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
+from rest_framework.permissions import IsAuthenticated
 
 
 class CommentListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
 
     pagination_class = CustomLimitOffsetPagination()
 

@@ -5,9 +5,11 @@ from ..models import OTP
 from ..serializers import OTPSerializer, OTPVerifySerializer
 from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
+from rest_framework.permissions import IsAuthenticated
 
 
 class OTPListCreateView(APIView):
+    # permission_classes = [IsAuthenticated]
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
