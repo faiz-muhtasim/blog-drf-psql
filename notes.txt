@@ -25,3 +25,12 @@ using that OTP new pass will be saved
 2. otp mechanism
 3. mail service
 6. otp success msg edit
+
+
+
+
+auth in different app
+posts public and private
+
+mail service
+logger
