@@ -1,5 +1,5 @@
 1. get thik korsi, baki method gula serializer chara pass korbo
-2. error response thik kora in postman
+2. error response thik kora in postman (kontar kheyal nai)
 3. logger set kora (django logger)
 4. constants gulo env te nite hbe
 5. response msg a list ante hbe, baki gulo muche dibo
@@ -13,3 +13,11 @@
 13. otp mechanism bujhano
 14. otp success msg edit
 15. posts public and private
+16. 2 step verificaion
+17. reaction on post and comments
+18. share post
+
+chobi/video upload
+messaging baki
+video audio call
+add friends
