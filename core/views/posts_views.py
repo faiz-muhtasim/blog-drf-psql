@@ -44,11 +44,11 @@ class PostListCreateView(APIView):
         try:
             serializer = PostSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(error_response(serializer.errors, "Validation error", 400), status=status.HTTP_400_BAD_REQUEST)
-            post = Posts.objects.create_post(serializer.validated_data, user=request.user)  # 👈 pass user
-            return Response(success_response(PostSerializer(post).data, "Post created successfully", 201), status=status.HTTP_201_CREATED)
+                return Response(error_response(serializer.errors, "Information is Validation"), status=status.HTTP_400_BAD_REQUEST)
+            Posts.objects.create_post(serializer.validated_data, user=request.user)  # 👈 pass user
+            return Response(success_response(None, "Post created successfully"), status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response(error_response(message=str(e), code=500), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(error_response(message=str(e), code=status.HTTP_500_INTERNAL_SERVER_ERROR), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PostRetrieveUpdateDeleteView(APIView):
