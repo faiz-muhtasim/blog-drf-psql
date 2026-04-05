@@ -18,6 +18,7 @@
 18. share post
 19. bearer er place a amar naam thakbe
 20. search r get all post duita alada alada lagbe na, ekta method ei implement kora lagbe, because basically they are doing the same thing
+21 optimise n+1 query
 
 chobi/video upload
 messaging baki
