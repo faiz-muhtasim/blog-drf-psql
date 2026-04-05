@@ -16,6 +16,7 @@
 16. 2 step verificaion
 17. reaction on post and comments
 18. share post
+19. bearer er place a amar naam thakbe
 
 chobi/video upload
 messaging baki

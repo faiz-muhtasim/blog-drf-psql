@@ -6,6 +6,8 @@ from ..serializers import PostSerializer
 from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import logging
+logger = logging.getLogger(__name__)
 
 
 class PostListCreateView(APIView):
@@ -43,13 +45,17 @@ class PostListCreateView(APIView):
     def post(self, request):
         try:
             serializer = PostSerializer(data=request.data)
+
             if not serializer.is_valid():
-                return Response(error_response(serializer.errors, "Information is Validation"), status=status.HTTP_400_BAD_REQUEST)
-            Posts.objects.create_post(serializer.validated_data, user=request.user)  # 👈 pass user
+                logger.warning(f"Post creation validation failed: {serializer.errors}")
+                return Response(error_response("Information is invalid", status.HTTP_400_BAD_REQUEST), status=status.HTTP_400_BAD_REQUEST)
+
+            Posts.objects.create_post(serializer.validated_data, user=request.user)
+
             return Response(success_response(None, "Post created successfully"), status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response(error_response(message=str(e), code=status.HTTP_500_INTERNAL_SERVER_ERROR), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            logger.error(f"Error creating post: {e}")
+            return Response(error_response(message="Something went wrong", code=status.HTTP_500_INTERNAL_SERVER_ERROR), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PostRetrieveUpdateDeleteView(APIView):
 
