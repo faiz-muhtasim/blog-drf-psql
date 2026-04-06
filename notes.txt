@@ -1,5 +1,5 @@
 1. get thik korsi, baki method gula serializer chara pass korbo
-2. error response thik kora in postman (kontar kheyal nai)
+
 3. logger set kora (django logger)
 4. constants gulo env te nite hbe
 5. response msg a list ante hbe, baki gulo muche dibo
