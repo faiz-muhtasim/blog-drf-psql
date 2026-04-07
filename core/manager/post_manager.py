@@ -2,11 +2,19 @@ from django.db import models
 from .base import _soft_delete
 from ..utils.choices import POST_DRAFT
 from django.db.models import Q
-
+from django.db.models import Prefetch
 
 class PostManager(models.Manager):
     def get_all_posts(self):
-        return self.filter(is_deleted=False).prefetch_related('comments')
+        from ..models import Comments  # 👈 move import here
+
+        return self.filter(is_deleted=False).prefetch_related(
+            Prefetch(
+                    'comments',
+                    queryset=Comments.objects.filter(is_deleted=False),
+                    to_attr='active_comments'
+                )
+            )
 
     def get_post_by_id(self, pk):
         try:
@@ -41,7 +49,15 @@ class PostManager(models.Manager):
         return True
 
     def search_posts(self, keyword):
+        from ..models import Comments  # 👈 same here
+
         return self.filter(
             Q(title__icontains=keyword) | Q(description__icontains=keyword),
             is_deleted=False
-    )
+        ).prefetch_related(
+            Prefetch(
+                'comments',
+                queryset=Comments.objects.filter(is_deleted=False),
+                to_attr='active_comments'
+            )
+        )

@@ -8,6 +8,7 @@ from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import logging
 logger = logging.getLogger(__name__)
+from django.db.models import Prefetch
 
 
 class PostListCreateView(APIView):
@@ -37,7 +38,14 @@ class PostListCreateView(APIView):
                 'title': post.title,
                 'description': post.description,
                 'status': post.status,
-                'comments': list(post.comments.filter(is_deleted=False).values('id', 'body', 'created_at'))
+                'comments': [
+                    {
+                        'id': c.id,
+                        'body': c.body,
+                        'created_at': c.created_at
+                    }
+                    for c in post.active_comments  # 👈 NO QUERY HERE
+                ]
             })
 
         return paginator.get_paginated_response(data)
