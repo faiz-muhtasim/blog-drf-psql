@@ -22,33 +22,13 @@ class PostListCreateView(APIView):
 
     def get(self, request):
         keyword = request.query_params.get('search', None)
-
         if keyword:
             posts = Posts.objects.search_posts(keyword)
         else:
             posts = Posts.objects.get_all_posts()
 
-        paginator = self.pagination_class
-        page = paginator.paginate_queryset(posts, request, view=self)
-
-        data = []
-        for post in page:
-            data.append({
-                'id': post.id,
-                'title': post.title,
-                'description': post.description,
-                'status': post.status,
-                'comments': [
-                    {
-                        'id': c.id,
-                        'body': c.body,
-                        'created_at': c.created_at
-                    }
-                    for c in post.active_comments  # 👈 NO QUERY HERE
-                ]
-            })
-
-        return paginator.get_paginated_response(data)
+        page = self.pagination_class.paginate_queryset(posts, request, view=self)
+        return self.pagination_class.get_paginated_response(page)
 
     def post(self, request):
         try:
