@@ -5,16 +5,23 @@ from django.db.models import Q
 from django.db.models import Prefetch
 
 class PostManager(models.Manager):
-    def get_all_posts(self):
-        from ..models import Comments  # 👈 move import here
+    def get_posts(self, keyword=None):
+        from ..models import Comments
 
-        return self.filter(is_deleted=False).prefetch_related(
-            Prefetch(
-                    'comments',
-                    queryset=Comments.objects.filter(is_deleted=False),
-                    to_attr='active_comments'
-                )
+        queryset = self.filter(is_deleted=False)
+
+        if keyword:
+            queryset = queryset.filter(
+                Q(title__icontains=keyword) | Q(description__icontains=keyword)
             )
+
+        return queryset.prefetch_related(
+            Prefetch(
+                'comments',
+                queryset=Comments.objects.filter(is_deleted=False),
+                to_attr='active_comments'
+            )
+        )
 
     def get_post_by_id(self, pk):
         try:
@@ -47,17 +54,3 @@ class PostManager(models.Manager):
         _soft_delete(instance)
         instance.comments.filter(is_deleted=False).update(is_deleted=True)
         return True
-
-    def search_posts(self, keyword):
-        from ..models import Comments  # 👈 same here
-
-        return self.filter(
-            Q(title__icontains=keyword) | Q(description__icontains=keyword),
-            is_deleted=False
-        ).prefetch_related(
-            Prefetch(
-                'comments',
-                queryset=Comments.objects.filter(is_deleted=False),
-                to_attr='active_comments'
-            )
-        )

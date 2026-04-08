@@ -8,7 +8,6 @@ from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import logging
 logger = logging.getLogger(__name__)
-from django.db.models import Prefetch
 
 
 class PostListCreateView(APIView):
@@ -22,10 +21,7 @@ class PostListCreateView(APIView):
 
     def get(self, request):
         keyword = request.query_params.get('search', None)
-        if keyword:
-            posts = Posts.objects.search_posts(keyword)
-        else:
-            posts = Posts.objects.get_all_posts()
+        posts = Posts.objects.get_posts(keyword)  # 👈 one call, handles both cases
 
         page = self.pagination_class.paginate_queryset(posts, request, view=self)
         return self.pagination_class.get_paginated_response(page)
