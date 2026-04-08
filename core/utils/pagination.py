@@ -2,8 +2,6 @@ from collections import OrderedDict, defaultdict
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from django.db.models import Prefetch
-from ..models import Comments
 
 
 class CustomLimitOffsetPagination(LimitOffsetPagination):
@@ -18,40 +16,30 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
         if self.count == 0 or self.offset > self.count:
             return []
 
-        # ✅ Prefetch only active comments, sliced queryset
-        sliced_qs = queryset[self.offset:self.offset + self.limit].prefetch_related(
-            Prefetch(
-                'comments',                          # your related_name on Comments model
-                queryset=Comments.objects.filter(is_deleted=False).only(
-                    'id', 'body', 'created_at', 'post_id'
-                ),
-                to_attr='active_comments_list'       # stored as a plain list
-            )
-        )
+        # ✅ Evaluate once — DB hit happens here, prefetch cache is populated
+        sliced_qs = list(queryset[self.offset:self.offset + self.limit])
 
-        # ✅ Pull post fields as dicts — no loop, no manual mapping
-        posts_values = list(sliced_qs.values(
-            'id', 'title', 'description', 'is_deleted'
-        ))
+        # ✅ Build post dicts from model instances (no extra query)
+        posts_values = [
+            {'id': p.id, 'title': p.title, 'description': p.description, 'status': p.status}
+            for p in sliced_qs
+        ]
 
-        # ✅ Build comment lookup: {post_id: [comment, ...]} — dict comprehension, no loop
+        # ✅ Build comment lookup from already-prefetched active_comments (no extra query)
         comment_map = defaultdict(list)
-        # Note: we still need ONE pass to group comments — but it's a single flat comprehension
         _ = [
-            comment_map[c.post_id].append(
+            comment_map[post_obj.id].append(
                 {'id': c.id, 'body': c.body, 'created_at': c.created_at}
             )
             for post_obj in sliced_qs
-            for c in post_obj.active_comments_list
+            for c in post_obj.active_comments  # 👈 to_attr set in manager.py
         ]
 
-        # ✅ Attach comments to each post dict — no nested loop, just dict update
-        result = [
+        # ✅ Merge comments into post dicts
+        return [
             {**post, 'comments': comment_map[post['id']]}
             for post in posts_values
         ]
-
-        return result
 
     def get_paginated_response(self, data):
         return Response(OrderedDict([
