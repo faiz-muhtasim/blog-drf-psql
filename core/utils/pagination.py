@@ -4,6 +4,18 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 
+def format_post(post_obj, comments=None):
+    data = {
+        'id': post_obj.id,
+        'title': post_obj.title,
+        'description': post_obj.description,
+        'status': post_obj.status,
+    }
+    if comments is not None:
+        data['comments'] = comments
+    return data
+
+
 class CustomLimitOffsetPagination(LimitOffsetPagination):
     default_limit = 10
 
@@ -19,26 +31,18 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
         # ✅ Evaluate once — DB hit happens here, prefetch cache is populated
         sliced_qs = list(queryset[self.offset:self.offset + self.limit])
 
-        # ✅ Build post dicts from model instances (no extra query)
-        posts_values = [
-            {'id': p.id, 'title': p.title, 'description': p.description, 'status': p.status}
-            for p in sliced_qs
-        ]
-
         # ✅ Build comment lookup from already-prefetched active_comments (no extra query)
         comment_map = defaultdict(list)
-        _ = [
-            comment_map[post_obj.id].append(
-                {'id': c.id, 'body': c.body, 'created_at': c.created_at}
-            )
-            for post_obj in sliced_qs
-            for c in post_obj.active_comments  # 👈 to_attr set in manager.py
-        ]
+        for post_obj in sliced_qs:
+            for c in post_obj.active_comments:
+                comment_map[post_obj.id].append(
+                    {'id': c.id, 'body': c.body, 'created_at': c.created_at}
+                )
 
-        # ✅ Merge comments into post dicts
+        # ✅ Build post dicts using shared helper
         return [
-            {**post, 'comments': comment_map[post['id']]}
-            for post in posts_values
+            format_post(p, comments=comment_map[p.id])
+            for p in sliced_qs
         ]
 
     def get_paginated_response(self, data):

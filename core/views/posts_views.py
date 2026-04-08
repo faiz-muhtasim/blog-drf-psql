@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..models import Posts, Comments
 from ..serializers import PostSerializer
-from core.utils.pagination import CustomLimitOffsetPagination
+from core.utils.pagination import CustomLimitOffsetPagination, format_post
 from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import logging
@@ -20,11 +20,16 @@ class PostListCreateView(APIView):
         return [IsAuthenticated()]
 
     def get(self, request):
-        keyword = request.query_params.get('search', None)
-        posts = Posts.objects.get_posts(keyword)  # 👈 one call, handles both cases
+        try:
+            keyword = request.query_params.get('search', None)
+            posts = Posts.objects.get_posts(keyword)
 
-        page = self.pagination_class.paginate_queryset(posts, request, view=self)
-        return self.pagination_class.get_paginated_response(page)
+            page = self.pagination_class.paginate_queryset(posts, request, view=self)
+            return self.pagination_class.get_paginated_response(page)
+
+        except Exception as e:
+            logger.error(f"Error fetching posts: {e}")
+            return Response(error_response(message="Something went wrong", code=status.HTTP_500_INTERNAL_SERVER_ERROR),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
         try:
@@ -50,19 +55,19 @@ class PostRetrieveUpdateDeleteView(APIView):
         return [IsAuthenticated()]
 
     def get(self, request, pk):
-        post = Posts.objects.get_post_by_id(pk)
-        if not post:
-            logger.warning(f"Post not found: id={pk}")
-            return Response(error_response(message="Post not found", code=status.HTTP_404_NOT_FOUND),status=status.HTTP_404_NOT_FOUND)
+        try:
+            post = Posts.objects.get_post_by_id(pk)
+            if not post:
+                logger.warning(f"Post fetch failed - not found: id={pk}")
+                return Response(error_response(message="Post not found", code=status.HTTP_404_NOT_FOUND),status=status.HTTP_404_NOT_FOUND)
 
-        data = {
-            'id': post.id,
-            'title': post.title,
-            'description': post.description,
-            'status': post.status,
-            'comments': list(Comments.objects.get_comments_by_post(post))  # 👈 clean
-        }
-        return Response(success_response(data, "Post fetched successfully", include_data=True),status=status.HTTP_200_OK)
+            comments = list(Comments.objects.get_comments_by_post(post))
+            data = format_post(post, comments=comments)
+            return Response(success_response(data, "Post fetched successfully", include_data=True),status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Error fetching post: id={pk}, error={e}")
+            return Response(error_response(message="Something went wrong", code=status.HTTP_500_INTERNAL_SERVER_ERROR),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def put(self, request, pk):
         try:
