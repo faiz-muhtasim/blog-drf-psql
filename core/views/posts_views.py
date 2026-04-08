@@ -23,7 +23,6 @@ class PostListCreateView(APIView):
         try:
             keyword = request.query_params.get('search', None)
             posts = Posts.objects.get_posts(keyword)
-
             page = self.pagination_class.paginate_queryset(posts, request, view=self)
             return self.pagination_class.get_paginated_response(page)
 
@@ -34,13 +33,11 @@ class PostListCreateView(APIView):
     def post(self, request):
         try:
             serializer = PostSerializer(data=request.data)
-
             if not serializer.is_valid():
                 logger.warning(f"Post creation validation failed: {serializer.errors}")
                 return Response(error_response("Information is invalid", status.HTTP_400_BAD_REQUEST), status=status.HTTP_400_BAD_REQUEST)
 
             Posts.objects.create_post(serializer.validated_data, user=request.user)
-
             return Response(success_response(None, "Post created successfully"), status=status.HTTP_201_CREATED)
 
         except Exception as e:
@@ -72,7 +69,6 @@ class PostRetrieveUpdateDeleteView(APIView):
     def put(self, request, pk):
         try:
             post = Posts.objects.get_post_by_id(pk)
-
             if not post:
                 logger.warning(f"Post update failed - not found: id={pk}")
                 return Response(error_response(message="Post not found", code=status.HTTP_404_NOT_FOUND), status=status.HTTP_404_NOT_FOUND)
@@ -87,7 +83,7 @@ class PostRetrieveUpdateDeleteView(APIView):
                 logger.warning(f"Post update validation failed: id={pk}, errors={serializer.errors}")
                 return Response(error_response("Validation error", status.HTTP_400_BAD_REQUEST),status=status.HTTP_400_BAD_REQUEST)
 
-            updated_post = Posts.objects.update_post(pk, serializer.validated_data)
+            Posts.objects.update_post(pk, serializer.validated_data)
             return Response(success_response(None, "Post updated successfully"),status=status.HTTP_200_OK)
 
         except Exception as e:
