@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from ..models import Posts
+from ..models import Posts, Comments
 from ..serializers import PostSerializer
 from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
@@ -51,19 +51,17 @@ class PostRetrieveUpdateDeleteView(APIView):
 
     def get(self, request, pk):
         post = Posts.objects.get_post_by_id(pk)
-
         if not post:
             logger.warning(f"Post not found: id={pk}")
-            return Response(error_response(message="Post not found", code=status.HTTP_404_NOT_FOUND), status=status.HTTP_404_NOT_FOUND)
+            return Response(error_response(message="Post not found", code=status.HTTP_404_NOT_FOUND),status=status.HTTP_404_NOT_FOUND)
 
         data = {
             'id': post.id,
             'title': post.title,
             'description': post.description,
             'status': post.status,
-            'comments': list(post.comments.filter(is_deleted=False).values('id', 'body', 'created_at'))
+            'comments': list(Comments.objects.get_comments_by_post(post))  # 👈 clean
         }
-
         return Response(success_response(data, "Post fetched successfully", include_data=True),status=status.HTTP_200_OK)
 
     def put(self, request, pk):
