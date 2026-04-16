@@ -3,12 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..models import Posts, Comments
 from ..serializers import PostSerializer
-from core.utils.pagination import CustomLimitOffsetPagination, format_post
+from core.utils.pagination import CustomLimitOffsetPagination
+from core.utils.formatter import format_post, format_comment
 from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import logging
 logger = logging.getLogger(__name__)
-
 
 class PostListCreateView(APIView):
 
@@ -58,7 +58,7 @@ class PostRetrieveUpdateDeleteView(APIView):
                 logger.warning(f"Post fetch failed - not found: id={pk}")
                 return Response(error_response(message="Post not found", code=status.HTTP_404_NOT_FOUND),status=status.HTTP_404_NOT_FOUND)
 
-            comments = list(Comments.objects.get_comments_by_post(post))
+            comments = [format_comment(c) for c in Comments.objects.get_comments_by_post(post)]
             data = format_post(post, comments=comments)
             return Response(success_response(data, "Post fetched successfully", include_data=True),status=status.HTTP_200_OK)
 

@@ -2,19 +2,7 @@ from collections import OrderedDict, defaultdict
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-
-
-def format_post(post_obj, comments=None):
-    data = {
-        'id': post_obj.id,
-        'title': post_obj.title,
-        'description': post_obj.description,
-        'status': post_obj.status,
-    }
-    if comments is not None:
-        data['comments'] = comments
-    return data
-
+from ..utils.formatter import format_post
 
 class CustomLimitOffsetPagination(LimitOffsetPagination):
     default_limit = 10
@@ -35,9 +23,7 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
         comment_map = defaultdict(list)
         for post_obj in sliced_qs:
             for c in post_obj.active_comments:
-                comment_map[post_obj.id].append(
-                    {'id': c.id, 'body': c.body, 'created_at': c.created_at}
-                )
+                comment_map[post_obj.id].append(format_comment(c))
 
         # ✅ Build post dicts using shared helper
         return [

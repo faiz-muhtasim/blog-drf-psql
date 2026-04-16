@@ -7,18 +7,16 @@ from django.db.models import Prefetch
 class PostManager(models.Manager):
     def get_posts(self, keyword=None):
         from ..models import Comments
-
         queryset = self.filter(is_deleted=False)
-
         if keyword:
             queryset = queryset.filter(
                 Q(title__icontains=keyword) | Q(description__icontains=keyword)
             )
-
-        return queryset.prefetch_related(
+        return queryset.select_related('user').prefetch_related(  # 👈 post author
             Prefetch(
                 'comments',
-                queryset=Comments.objects.filter(is_deleted=False),
+                queryset=Comments.objects.filter(is_deleted=False)
+                .select_related('user'),  # 👈 comment authors
                 to_attr='active_comments'
             )
         )

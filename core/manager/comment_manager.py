@@ -13,7 +13,7 @@ class CommentManager(models.Manager):
             return None
 
     def get_comments_by_post(self, post):
-        return self.filter(post=post, is_deleted=False).values('id', 'body', 'created_at')
+        return self.filter(post=post, is_deleted=False).select_related('user')
 
     def create_comment(self, validated_data, user):         # 👈 added user param
         post = validated_data['post']
