@@ -21,6 +21,9 @@
 21. optimise n+1 query
 22. subquery pora lagbe, and sub query vs select related vs prefetch related bujhano.
 
+
+alada kore comment view, manager kora lagbe? whereas im fetching comments with post, amar alada comment er view and manager er shob method er drkr ache? jeigula post a lage na?
+
 chobi/video upload
 messaging baki
 video audio call

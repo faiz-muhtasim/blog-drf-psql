@@ -23,4 +23,5 @@ def format_comment(comment_obj):
         'body': comment_obj.body,
         'created_at': comment_obj.created_at,
         'user': format_user(comment_obj.user),
+        'post_id': comment_obj.post_id
     }

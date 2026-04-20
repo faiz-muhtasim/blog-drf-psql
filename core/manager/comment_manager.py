@@ -3,15 +3,16 @@ from .base import _soft_delete
 
 
 class CommentManager(models.Manager):
+
     def get_all_comments(self):
-        return self.filter(is_deleted=False)
+        return self.filter(is_deleted=False).select_related('user')
 
     def get_comment_by_id(self, pk):
         try:
-            return self.get(pk=pk, is_deleted=False)
+            return self.get(pk=pk, is_deleted=False)  # single object, no select_related needed
         except self.model.DoesNotExist:
             return None
-
+        
     def get_comments_by_post(self, post):
         return self.filter(post=post, is_deleted=False).select_related('user')
 

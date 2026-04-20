@@ -2,7 +2,8 @@ from collections import OrderedDict, defaultdict
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from ..utils.formatter import format_post
+from ..utils.formatter import format_post, format_comment
+
 
 class CustomLimitOffsetPagination(LimitOffsetPagination):
     default_limit = 10
@@ -16,20 +17,24 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
         if self.count == 0 or self.offset > self.count:
             return []
 
-        # ✅ Evaluate once — DB hit happens here, prefetch cache is populated
         sliced_qs = list(queryset[self.offset:self.offset + self.limit])
 
-        # ✅ Build comment lookup from already-prefetched active_comments (no extra query)
-        comment_map = defaultdict(list)
-        for post_obj in sliced_qs:
-            for c in post_obj.active_comments:
-                comment_map[post_obj.id].append(format_comment(c))
+        if not sliced_qs:
+            return []
 
-        # ✅ Build post dicts using shared helper
-        return [
-            format_post(p, comments=comment_map[p.id])
-            for p in sliced_qs
-        ]
+        # Posts — has active_comments from prefetch
+        if hasattr(sliced_qs[0], 'active_comments'):
+            comment_map = defaultdict(list)
+            for post_obj in sliced_qs:
+                for c in post_obj.active_comments:
+                    comment_map[post_obj.id].append(format_comment(c))
+            return [
+                format_post(p, comments=comment_map[p.id])
+                for p in sliced_qs
+            ]
+
+        # Comments — flat list
+        return [format_comment(obj) for obj in sliced_qs]
 
     def get_paginated_response(self, data):
         return Response(OrderedDict([
