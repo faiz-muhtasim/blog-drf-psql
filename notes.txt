@@ -1,11 +1,9 @@
-1. get thik korsi, baki method gula serializer chara pass korbo posts done
-
+1. serializer chara response pass korbo
 3. logger set kora (django logger) posts done
 4. constants gulo env te nite hbe
-5. response msg a list ante hbe, baki gulo muche dibo
-6. auth alada app a banabo
+6. auth,otp alada app a banabo
 7. auth er shathe otp integrate kora
-8. auth better kora, like including other info
+8. registration better kora, like including other info
 9. mail service avail kora for otp
 10. jwt bujha, where the secret is!
 11. Have to implement password reset functionality
