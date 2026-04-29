@@ -51,10 +51,3 @@ class OTP(models.Model):
     expired_at = models.DateTimeField(null=True, blank=True)
 
     objects = OTPManager()
-
-    @property
-    def is_expired(self):
-        """True if past expired_at (computed from expired_at, not stored)."""
-        if not self.expired_at:
-            return False
-        return timezone.now() > self.expired_at

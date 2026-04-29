@@ -2,6 +2,7 @@
 3. logger set kora (django logger) posts done
 4. constants gulo env te nite hbe
 6. auth,otp alada app a banabo
+otp te auth integrate kora.
 7. auth er shathe otp integrate kora
 8. registration better kora, like including other info
 9. mail service avail kora for otp
