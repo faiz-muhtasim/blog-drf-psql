@@ -6,15 +6,17 @@ from ..serializers import OTPSerializer, OTPVerifySerializer
 from core.utils.pagination import CustomLimitOffsetPagination
 from core.utils.response import success_response, error_response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 
 class OTPListCreateView(APIView):
     # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     pagination_class = CustomLimitOffsetPagination()
 
     def get(self, request):
-        otps = OTP.objects.get_all_otps().values()
-        paginator = self.pagination_class
+        otps = OTP.objects.get_all_otps()
+        paginator = CustomLimitOffsetPagination()
         page = paginator.paginate_queryset(otps, request, view=self)
         return paginator.get_paginated_response(page)
 
@@ -30,6 +32,7 @@ class OTPListCreateView(APIView):
 
 
 class OTPVerifyView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)

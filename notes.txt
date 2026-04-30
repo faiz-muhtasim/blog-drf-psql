@@ -1,23 +1,22 @@
-1. serializer chara response pass korbo
-3. logger set kora (django logger) posts done
-4. constants gulo env te nite hbe
-6. auth,otp alada app a banabo
-otp te auth integrate kora.
-7. auth er shathe otp integrate kora
+1. otp te auth integrate kora.
 8. registration better kora, like including other info
 9. mail service avail kora for otp
-10. jwt bujha, where the secret is!
 11. Have to implement password reset functionality
-12. built in user table use korsi... now another table for extra info thakbe
-13. otp mechanism bujhano
-14. otp success msg edit
 15. posts public and private
-16. 2 step verificaion
 17. reaction on post and comments
 18. share post
+
+
+16. 2 step verificaion
+
+
+
+4. constants gulo env te nite hbe
+6. auth,otp alada app a banabo
+7. auth er shathe otp integrate kora
+10. jwt bujha, where the secret is!
+13. otp mechanism bujhano
 19. bearer er place a amar naam thakbe
-20. search r get all post duita alada alada lagbe na, ekta method ei implement kora lagbe, because basically they are doing the same thing
-21. optimise n+1 query
 22. subquery pora lagbe, and sub query vs select related vs prefetch related bujhano.
 
 

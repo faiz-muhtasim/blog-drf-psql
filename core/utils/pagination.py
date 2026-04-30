@@ -33,7 +33,20 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
                 for p in sliced_qs
             ]
 
-        # Comments — flat list
+        first = sliced_qs[0]
+        if hasattr(first, 'otp'):
+            return [
+                {
+                    'id': obj.id,
+                    'otp': obj.otp,
+                    'task_type': obj.task_type,
+                    'has_used': obj.has_used,
+                    'expired_at': obj.expired_at,
+                    'created_at': obj.created_at,
+                }
+                for obj in sliced_qs
+            ]
+
         return [format_comment(obj) for obj in sliced_qs]
 
     def get_paginated_response(self, data):
