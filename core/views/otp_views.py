@@ -37,16 +37,26 @@ class OTPVerifyView(APIView):
     def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(error_response(serializer.errors, "Validation error", 400), status=status.HTTP_400_BAD_REQUEST)
+            return Response(error_response(serializer.errors, "Validation error", 400), status=400)
+
         data = serializer.validated_data
         otp_instance = OTP.objects.get_otp_by_code(
-            otp_code=data["otp"],
-            task_type=data.get("task_type"),
+            otp_code=data['otp'],
+            task_type=data.get('task_type'),
         )
+
         if not otp_instance:
-            return Response(error_response(message="Invalid, expired, or already used OTP", code=400), status=status.HTTP_400_BAD_REQUEST)
-        OTP.objects.mark_otp_used(otp_instance.pk)  # pass pk, not instance
-        return Response(success_response(message="OTP verified successfully"), status=status.HTTP_200_OK)
+            return Response(error_response(message="Invalid, expired, or already used OTP", code=400), status=400)
+
+        OTP.objects.mark_otp_used(otp_instance.pk)
+
+        # Activate user if registration OTP
+        if otp_instance.task_type == 'registration' and otp_instance.user:
+            user = otp_instance.user
+            user.is_active = True
+            user.save()
+
+        return Response(success_response(message="OTP verified successfully"), status=200)
 
 
 class OTPRetrieveDeleteView(APIView):

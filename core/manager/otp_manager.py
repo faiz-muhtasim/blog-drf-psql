@@ -3,9 +3,10 @@ from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 from .base import _soft_delete
+from django.core.mail import send_mail
+from django.conf import settings
 
 OTP_EXPIRY_MINUTES = 2
-
 
 class OTPManager(models.Manager):
     def get_all_otps(self):
@@ -27,6 +28,25 @@ class OTPManager(models.Manager):
             expired_at=expires_at,
         )
 
+    def create_otp_for_user(self, user, task_type):
+        otp_value = str(random.randint(100000, 999999))
+        expires_at = timezone.now() + timedelta(minutes=OTP_EXPIRY_MINUTES)
+        otp = self.create(
+            user=user,
+            otp=otp_value,
+            has_used=False,
+            task_type=task_type,
+            expired_at=expires_at,
+        )
+        send_mail(
+            subject='Your OTP Code',
+            message=f'Your OTP is: {otp_value}. It expires in {OTP_EXPIRY_MINUTES} minutes.',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        return otp
+
     @staticmethod
     def is_otp_expired(instance):
         if not instance.expired_at:
@@ -35,7 +55,7 @@ class OTPManager(models.Manager):
 
     def get_otp_by_code(self, otp_code, task_type=None):
         now = timezone.now()
-        qs = self.filter(
+        qs = self.select_related('user').filter(
             otp=otp_code,
             has_used=False,
             is_deleted=False,
