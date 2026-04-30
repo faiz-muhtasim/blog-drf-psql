@@ -143,3 +143,12 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,  # invalidate old refresh tokens
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'a479ae001@smtp-brevo.com'
+EMAIL_HOST_PASSWORD = '1CQkgX4UMbPtYcfA'
+DEFAULT_FROM_EMAIL = 'a479ae001@smtp-brevo.com'

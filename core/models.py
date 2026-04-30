@@ -43,11 +43,16 @@ class Comments(models.Model):
 
 
 class OTP(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True, blank=True,  # keep flexible
+        related_name='otps'
+    )
     otp = models.CharField(max_length=6)
     has_used = models.BooleanField(default=False)
     task_type = models.CharField(max_length=20, choices=TASK_TYPE_CHOICES)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expired_at = models.DateTimeField(null=True, blank=True)
-
     objects = OTPManager()
